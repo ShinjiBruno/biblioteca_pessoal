@@ -1,0 +1,9 @@
+fastapi[all]
+uvicorn
+sqlalchemy[asyncio]
+aiomysql
+sqlmodel
+boto3
+python-multipart
+python-dotenv
+cryptography

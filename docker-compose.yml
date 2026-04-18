@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: biblioteca-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: biblioteca
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./infra/mysql/data:/var/lib/mysql
+      - ./infra/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # Identity Management
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: biblioteca-keycloak
+    command: start-dev
+    environment:
+      KC_DB: dev-file 
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+
+  # Object Storage
+  minio:
+    image: minio/minio
+    container_name: biblioteca-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # API
+      - "9001:9001" # Console Web
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+    volumes:
+      - ./storage/minio_data:/data
+
+  backend:
+    build: ./backend
+    container_name: biblioteca-api
+    depends_on:
+      - mysql
+      - minio
+    environment:
+      DATABASE_URL: "mysql+aiomysql://user:password@mysql:3306/biblioteca"
+    ports:
+      - "8000:8000"
+
+  # API Gateway
+  krakend:
+    image: devopsfaith/krakend:latest
+    container_name: biblioteca-gateway
+    volumes:
+      - ./gateway/krakend.json:/etc/krakend/krakend.json
+    ports:
+      - "8081:8080" 
+    depends_on:
+      - backend
+
+  # Frontend Angular
+  # frontend:
+  #   build: ./frontend
+  #   container_name: biblioteca-web
+  #   ports:
+  #     - "4200:80"
+  #   depends_on:
+  #     - krakend
+    

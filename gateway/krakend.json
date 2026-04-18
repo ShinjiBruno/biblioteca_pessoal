@@ -1,0 +1,94 @@
+{
+  "$schema": "https://www.krakend.io/schema/v3.json",
+  "version": 3,
+  "name": "Biblioteca API Gateway",
+  "port": 8080,
+  "timeout": "3000ms",
+  "cache_ttl": "300s",
+  "extra_config": {
+    "security/cors": {
+      "allow_origins": ["http://localhost:4200"],
+      "allow_methods": ["GET", "POST", "PUT", "DELETE"],
+      "allow_headers": ["Origin", "Authorization", "Content-Type"],
+      "expose_headers": ["Content-Length"],
+      "max_age": "12h"
+    }
+  },
+  "endpoints": [
+    {
+      "endpoint": "/v1/livros",
+      "method": "GET",
+      "output_encoding": "json",
+      "backend": [
+        {
+          "url_pattern": "/livros",
+          "method": "GET",
+          "host": ["http://backend:8000"]
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8080/realms/biblioteca-realm/protocol/openid-connect/certs",
+          "issuer": "http://localhost:8080/realms/biblioteca-realm",
+          "roles_key": "realm_access.roles",
+          "roles": ["user", "admin"]
+        }
+      }
+    },
+    {
+      "endpoint": "/v1/livros",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/livros",
+          "method": "POST",
+          "host": ["http://backend:8000"]
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8080/realms/biblioteca-realm/protocol/openid-connect/certs",
+          "roles": ["admin"]
+        }
+      }
+    },
+    {
+      "endpoint": "/v1/livros",
+      "method": "PUT",
+      "backend": [
+        {
+          "url_pattern": "/livros/{livro_id}",
+          "method": "PUT",
+          "host": ["http://backend:8000"]
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8080/realms/biblioteca-realm/protocol/openid-connect/certs",
+          "roles": ["admin"]
+        }
+      }
+    },
+    {
+      "endpoint": "/v1/livros",
+      "method": "DELETE",
+      "backend": [
+        {
+          "url_pattern": "/livros/{livro_id}",
+          "method": "DELETE",
+          "host": ["http://backend:8000"]
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8080/realms/biblioteca-realm/protocol/openid-connect/certs",
+          "roles": ["admin"]
+        }
+      }
+    }
+  ]
+}

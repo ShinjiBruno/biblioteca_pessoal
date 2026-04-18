@@ -1,0 +1,10 @@
+<header class="topbar">
+  <div class="brand">Biblioteca Pessoal</div>
+  <nav class="toolbar">
+    <a routerLink="/livros" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Livros</a>
+    <a routerLink="/livros/novo" routerLinkActive="active">Novo livro</a>
+  </nav>
+</header>
+<main class="page-container">
+  <router-outlet></router-outlet>
+</main>
