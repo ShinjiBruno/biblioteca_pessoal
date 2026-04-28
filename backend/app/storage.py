@@ -1,6 +1,4 @@
 import boto3
-from botocore.exceptions import NoCredentialsError
-import os
 
 MINIO_ENDPOINT = "minio:9000"
 ACCESS_KEY = "admin"
@@ -16,10 +14,6 @@ s3_client = boto3.client(
 
 def upload_to_minio(file):
     try:
-        buckets = s3_client.list_buckets()
-        if BUCKET_NAME not in [b['Name'] for b in buckets['Buckets']]:
-            s3_client.create_bucket(Bucket=BUCKET_NAME)
-            
         s3_client.upload_fileobj(file.file, BUCKET_NAME, file.filename)
         return f"/{BUCKET_NAME}/{file.filename}"
     except Exception as e:

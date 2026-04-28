@@ -18,7 +18,7 @@
     {
       "endpoint": "/v1/livros",
       "method": "GET",
-      "output_encoding": "json",
+      "output_encoding": "no-op",
       "backend": [
         {
           "url_pattern": "/livros",
@@ -32,6 +32,9 @@
           "jwk_url": "http://keycloak:8080/realms/biblioteca-realm/protocol/openid-connect/certs",
           "issuer": "http://localhost:8080/realms/biblioteca-realm",
           "roles_key": "realm_access.roles",
+          "roles_key_is_nested": true,
+          "disable_jwk_security": true,
+          "cache": true,
           "roles": ["user", "admin"]
         }
       }
@@ -39,6 +42,8 @@
     {
       "endpoint": "/v1/livros",
       "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": ["Content-Type"],
       "backend": [
         {
           "url_pattern": "/livros",
@@ -50,13 +55,20 @@
         "auth/validator": {
           "alg": "RS256",
           "jwk_url": "http://keycloak:8080/realms/biblioteca-realm/protocol/openid-connect/certs",
+          "issuer": "http://localhost:8080/realms/biblioteca-realm",
+          "roles_key": "realm_access.roles",
+          "roles_key_is_nested": true,
+          "disable_jwk_security": true,
+          "cache": true,
           "roles": ["admin"]
         }
       }
     },
     {
-      "endpoint": "/v1/livros",
+      "endpoint": "/v1/livros/{livro_id}",
       "method": "PUT",
+      "output_encoding": "no-op",
+      "input_headers": ["Content-Type"],
       "backend": [
         {
           "url_pattern": "/livros/{livro_id}",
@@ -68,13 +80,19 @@
         "auth/validator": {
           "alg": "RS256",
           "jwk_url": "http://keycloak:8080/realms/biblioteca-realm/protocol/openid-connect/certs",
+          "issuer": "http://localhost:8080/realms/biblioteca-realm",
+          "roles_key": "realm_access.roles",
+          "roles_key_is_nested": true,
+          "disable_jwk_security": true,
+          "cache": true,
           "roles": ["admin"]
         }
       }
     },
     {
-      "endpoint": "/v1/livros",
+      "endpoint": "/v1/livros/{livro_id}",
       "method": "DELETE",
+      "output_encoding": "no-op",
       "backend": [
         {
           "url_pattern": "/livros/{livro_id}",
@@ -86,6 +104,11 @@
         "auth/validator": {
           "alg": "RS256",
           "jwk_url": "http://keycloak:8080/realms/biblioteca-realm/protocol/openid-connect/certs",
+          "issuer": "http://localhost:8080/realms/biblioteca-realm",
+          "roles_key": "realm_access.roles",
+          "roles_key_is_nested": true,
+          "disable_jwk_security": true,
+          "cache": true,
           "roles": ["admin"]
         }
       }

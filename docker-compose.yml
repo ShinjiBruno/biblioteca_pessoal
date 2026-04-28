@@ -11,7 +11,13 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: root_password
     ports:
-      - "3306:3306"
+      - "3307:3307"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
     volumes:
       - ./infra/mysql/data:/var/lib/mysql
       - ./infra/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -20,13 +26,16 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
     container_name: biblioteca-keycloak
-    command: start-dev
+    command: start-dev --import-realm
     environment:
       KC_DB: dev-file 
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
       - "8080:8080"
+    volumes:
+      - ./infra/keycloak/data:/opt/keycloak/data
+      - ./infra/keycloak/realm-biblioteca.json:/opt/keycloak/data/import/realm-biblioteca.json:ro
 
   # Object Storage
   minio:
@@ -39,19 +48,46 @@ services:
     environment:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
     volumes:
       - ./storage/minio_data:/data
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: biblioteca-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set local http://minio:9000 admin password; do
+        echo 'Aguardando MinIO...';
+        sleep 2;
+      done;
+      mc mb --ignore-existing local/livros;
+      echo 'Bucket livros pronto.';
+      "
 
   backend:
     build: ./backend
     container_name: biblioteca-api
     depends_on:
-      - mysql
-      - minio
+      mysql:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     environment:
       DATABASE_URL: "mysql+aiomysql://user:password@mysql:3306/biblioteca"
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
 
   # API Gateway
   krakend:
