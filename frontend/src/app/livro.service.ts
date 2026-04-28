@@ -17,6 +17,7 @@ export class LivroService {
   }
 
   createLivro(formData: FormData): Observable<Livro> {
+    console.log('Criando livro com dados:', formData);
     return this.http.post<Livro>(this.baseUrl, formData);
   }
 

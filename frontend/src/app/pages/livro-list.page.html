@@ -1,0 +1,37 @@
+<section class="page-header">
+    <div>
+    <h1>Biblioteca Pessoal</h1>
+    <p>Gerencie seus livros e arquivos PDF através do gateway Krakend.</p>
+    </div>
+    <a routerLink="/livros/novo" class="btn primary">Adicionar livro</a>
+</section>
+
+<div *ngIf="loading" class="message">Carregando livros...</div>
+<div *ngIf="error" class="message error">{{ error }}</div>
+
+<table *ngIf="!loading && livros.length" class="livro-table">
+    <thead>
+    <tr>
+        <th>Título</th>
+        <th>Autor</th>
+        <th>PDF</th>
+        <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let livro of livros">
+        <td>{{ livro.titulo }}</td>
+        <td>{{ livro.autor }}</td>
+        <td>
+        <a *ngIf="livro.pdf_url" [href]="livro.pdf_url" target="_blank" rel="noopener">Ver arquivo</a>
+        <span *ngIf="!livro.pdf_url">Nenhum arquivo</span>
+        </td>
+        <td class="actions-cell">
+        <button type="button" class="btn secondary" (click)="editar(livro.id)">Editar</button>
+        <button type="button" class="btn danger" (click)="remover(livro.id)">Excluir</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div *ngIf="!loading && !livros.length" class="message">Nenhum livro cadastrado ainda.</div>

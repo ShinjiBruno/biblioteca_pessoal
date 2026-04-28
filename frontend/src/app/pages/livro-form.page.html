@@ -1,0 +1,31 @@
+<section class="page-header">
+    <div>
+    <h1>{{ editing ? 'Editar livro' : 'Novo livro' }}</h1>
+    <p>Enviar título, autor e um arquivo PDF opcional para o gateway Krakend.</p>
+    </div>
+</section>
+
+<form class="book-form" (ngSubmit)="onSubmit()">
+    <label>
+    Título
+    <input name="titulo" type="text" [(ngModel)]="titulo" required />
+    </label>
+
+    <label>
+    Autor
+    <input name="autor" type="text" [(ngModel)]="autor" required />
+    </label>
+
+    <label>
+    Arquivo PDF (opcional)
+    <input type="file" (change)="onFileChange($event)" accept="application/pdf" />
+    </label>
+
+    <div class="actions">
+    <a routerLink="/livros" class="btn secondary">Cancelar</a>
+    <button type="submit" class="btn primary" [disabled]="loading">{{ editing ? 'Salvar' : 'Criar' }}</button>
+    </div>
+
+    <div *ngIf="message" class="message">{{ message }}</div>
+    <div *ngIf="error" class="message error">{{ error }}</div>
+</form>
