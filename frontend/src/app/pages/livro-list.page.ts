@@ -1,38 +1,51 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { LivroService } from '../livro.service';
 import { Livro } from '../livro.model';
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { MessageModule } from 'primeng/message';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TableModule, ButtonModule, CardModule, MessageModule, ProgressSpinnerModule, ToastModule],
+  providers: [MessageService],
   templateUrl: './livro-list.page.html',
   styleUrl: './livro-list.page.scss',
 })
 export class LivroListPage implements OnInit {
   livros: Livro[] = [];
-  loading = false;
+  loading = signal(false);
   error: string | null = null;
 
-  constructor(private livroService: LivroService, private router: Router) {}
+  constructor(
+    private livroService: LivroService,
+    private router: Router,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     this.loadLivros();
   }
 
   loadLivros(): void {
-    this.loading = true;
+    this.loading.set(true);
     this.error = null;
 
     this.livroService.getLivros().subscribe({
       next: (livros) => {
         this.livros = livros;
-        this.loading = false;
+        this.loading.set(false);
       },
-      error: () => {
-        this.error = 'Não foi possível carregar os livros. Verifique o gateway e autenticação.';
-        this.loading = false;
+      error: (err) => {
+        console.error('Erro ao carregar livros:', err);
+        this.error = 'Não foi possível carregar os livros. Verifique a conexão com a API.';
+        this.loading.set(false);
       },
     });
   }
@@ -46,12 +59,12 @@ export class LivroListPage implements OnInit {
       return;
     }
 
-    this.loading = true;
+    this.loading.set(true);
     this.livroService.deleteLivro(id).subscribe({
       next: () => this.loadLivros(),
       error: () => {
         this.error = 'Erro ao excluir livro. Tente novamente.';
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }

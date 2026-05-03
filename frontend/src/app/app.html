@@ -4,6 +4,14 @@
     <a routerLink="/livros" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Livros</a>
     <a routerLink="/livros/novo" routerLinkActive="active">Novo livro</a>
   </nav>
+  <p-button 
+    [text]="true"
+    [raised]="true"
+    [icon]="themeService.theme() === 'light' ? 'pi pi-sun' : 'pi pi-moon'" 
+    [rounded]="true"
+    (click)="toggleTheme()"
+    [attr.aria-label]="'Alternar para tema ' + (themeService.theme() === 'light' ? 'escuro' : 'claro')"
+  ></p-button>
 </header>
 <main class="page-container">
   <router-outlet></router-outlet>

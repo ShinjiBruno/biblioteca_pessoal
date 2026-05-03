@@ -1,37 +1,73 @@
-<section class="page-header">
-    <div>
-    <h1>Biblioteca Pessoal</h1>
-    <p>Gerencie seus livros e arquivos PDF através do gateway Krakend.</p>
+<div class="page-container">
+  <p-message *ngIf="error" severity="error" [text]="error" styleClass="w-full mb-4"></p-message>
+
+  <div *ngIf="loading()" class="loading-container">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Carregando livros...</p>
+  </div>
+
+  <div *ngIf="!(loading()) && livros.length" class="content-container">
+    <div class="header-section">
+      <div>
+        <h1>Sua Biblioteca</h1>
+        <p>Você tem {{ livros.length }} livro(s) cadastrado(s)</p>
+      </div>
+      <a routerLink="/livros/novo" pButton type="button" label="+ Adicionar Livro" icon="pi pi-plus" class="p-button-primary"></a>
     </div>
-    <a routerLink="/livros/novo" class="btn primary">Adicionar livro</a>
-</section>
 
-<div *ngIf="loading" class="message">Carregando livros...</div>
-<div *ngIf="error" class="message error">{{ error }}</div>
+    <div class="livros-grid">
+      <p-card *ngFor="let livro of livros" class="livro-card" [attr.data-id]="livro.id">
+        <ng-template pTemplate="header">
+          <div class="card-header">{{ livro.titulo }}</div>
+        </ng-template>
 
-<table *ngIf="!loading && livros.length" class="livro-table">
-    <thead>
-    <tr>
-        <th>Título</th>
-        <th>Autor</th>
-        <th>PDF</th>
-        <th>Ações</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr *ngFor="let livro of livros">
-        <td>{{ livro.titulo }}</td>
-        <td>{{ livro.autor }}</td>
-        <td>
-        <a *ngIf="livro.pdf_url" [href]="livro.pdf_url" target="_blank" rel="noopener">Ver arquivo</a>
-        <span *ngIf="!livro.pdf_url">Nenhum arquivo</span>
-        </td>
-        <td class="actions-cell">
-        <button type="button" class="btn secondary" (click)="editar(livro.id)">Editar</button>
-        <button type="button" class="btn danger" (click)="remover(livro.id)">Excluir</button>
-        </td>
-    </tr>
-    </tbody>
-</table>
+        <div class="card-content">
+          <div class="livro-info">
+            <span class="label">Autor:</span>
+            <span class="value">{{ livro.autor }}</span>
+          </div>
+          
+          <div class="livro-info">
+            <span class="label">Arquivo:</span>
+            <span *ngIf="livro.pdf_url" class="value">
+              <a [href]="livro.pdf_url" target="_blank" rel="noopener" class="pdf-link">📄 Ver PDF</a>
+            </span>
+            <span *ngIf="!livro.pdf_url" class="value no-file">Sem arquivo</span>
+          </div>
+        </div>
 
-<div *ngIf="!loading && !livros.length" class="message">Nenhum livro cadastrado ainda.</div>
+        <ng-template pTemplate="footer">
+          <div class="card-actions">
+            <button 
+              pButton 
+              type="button" 
+              label="Editar" 
+              icon="pi pi-pencil" 
+              class="p-button-info p-button-sm"
+              (click)="editar(livro.id)"
+            ></button>
+            <button 
+              pButton 
+              type="button" 
+              label="Excluir" 
+              icon="pi pi-trash" 
+              class="p-button-danger p-button-sm"
+              (click)="remover(livro.id)"
+            ></button>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+  </div>
+
+  <div *ngIf="!loading() && !livros.length" class="empty-state">
+    <p-card>
+      <div class="empty-content">
+        <i class="pi pi-inbox" style="font-size: 3rem; color: var(--primary-color);"></i>
+        <h2>Nenhum livro cadastrado</h2>
+        <p>Comece adicionando seu primeiro livro à sua biblioteca pessoal</p>
+        <a routerLink="/livros/novo" pButton type="button" label="Criar Primeiro Livro" icon="pi pi-plus" class="p-button-primary"></a>
+      </div>
+    </p-card>
+  </div>
+</div>

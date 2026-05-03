@@ -4,10 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LivroService } from '../livro.service';
 import { Livro } from '../livro.model';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ButtonModule, CardModule, InputTextModule, ProgressSpinnerModule, MessageModule],
   templateUrl: './livro-form.page.html',
   styleUrl: './livro-form.page.scss',
 })
@@ -54,8 +59,9 @@ export class LivroFormPage implements OnInit {
         this.autor = livro.autor;
         this.loading = false;
       },
-      error: () => {
-        this.error = 'Erro ao carregar livro. Confira se o Krakend está ativo e sua autenticação.';
+      error: (err) => {
+        console.error('Erro ao carregar livro:', err);
+        this.error = 'Erro ao carregar livro. Tente novamente.';
         this.loading = false;
       },
     });

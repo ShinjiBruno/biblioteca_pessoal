@@ -1,31 +1,69 @@
-<section class="page-header">
-    <div>
-    <h1>{{ editing ? 'Editar livro' : 'Novo livro' }}</h1>
-    <p>Enviar título, autor e um arquivo PDF opcional para o gateway Krakend.</p>
-    </div>
-</section>
+<div class="page-container">
+  <div class="max-w-2xl">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="page-header-card">
+          <h1>{{ editing ? 'Editar Livro' : 'Novo Livro' }}</h1>
+          <p>{{ editing ? 'Atualize os dados do livro' : 'Adicione um novo livro à sua biblioteca' }}</p>
+        </div>
+      </ng-template>
 
-<form class="book-form" (ngSubmit)="onSubmit()">
-    <label>
-    Título
-    <input name="titulo" type="text" [(ngModel)]="titulo" required />
-    </label>
+      <form (ngSubmit)="onSubmit()" class="form-container">
+        <div class="form-group">
+          <label for="titulo">Título *</label>
+          <input 
+            pInputText 
+            id="titulo"
+            name="titulo" 
+            type="text" 
+            [(ngModel)]="titulo" 
+            required 
+            class="w-full"
+            placeholder="Digite o título do livro"
+          />
+        </div>
 
-    <label>
-    Autor
-    <input name="autor" type="text" [(ngModel)]="autor" required />
-    </label>
+        <div class="form-group">
+          <label for="autor">Autor *</label>
+          <input 
+            pInputText 
+            id="autor"
+            name="autor" 
+            type="text" 
+            [(ngModel)]="autor" 
+            required 
+            class="w-full"
+            placeholder="Digite o nome do autor"
+          />
+        </div>
 
-    <label>
-    Arquivo PDF (opcional)
-    <input type="file" (change)="onFileChange($event)" accept="application/pdf" />
-    </label>
+        <div class="form-group">
+          <label for="arquivo">Arquivo PDF (opcional)</label>
+          <input 
+            type="file" 
+            id="arquivo"
+            (change)="onFileChange($event)" 
+            accept="application/pdf"
+            class="w-full"
+          />
+          <small *ngIf="arquivo" class="file-name">📎 {{ arquivo.name }}</small>
+        </div>
 
-    <div class="actions">
-    <a routerLink="/livros" class="btn secondary">Cancelar</a>
-    <button type="submit" class="btn primary" [disabled]="loading">{{ editing ? 'Salvar' : 'Criar' }}</button>
-    </div>
+        <p-message *ngIf="message" severity="success" [text]="message" styleClass="w-full mb-4"></p-message>
+        <p-message *ngIf="error" severity="error" [text]="error" styleClass="w-full mb-4"></p-message>
 
-    <div *ngIf="message" class="message">{{ message }}</div>
-    <div *ngIf="error" class="message error">{{ error }}</div>
-</form>
+        <div class="actions-container">
+          <a routerLink="/livros" pButton type="button" label="Cancelar" class="p-button-secondary"></a>
+          <button 
+            pButton 
+            type="submit" 
+            [label]="editing ? 'Salvar' : 'Criar'" 
+            class="p-button-primary"
+            [disabled]="loading"
+            [loading]="loading"
+          ></button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>
