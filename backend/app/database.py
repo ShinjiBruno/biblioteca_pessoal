@@ -4,11 +4,11 @@ import os
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import Field, SQLModel
-
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "mysql+aiomysql://user:password@mysql:3307/biblioteca",
-)
+from .env import DATABASE_URL
+# DATABASE_URL = os.getenv(
+#     "DATABASE_URL",
+#     "mysql+aiomysql://user:password@mysql:3307/biblioteca",
+# )
 
 engine = create_async_engine(
     DATABASE_URL,

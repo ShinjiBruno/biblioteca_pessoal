@@ -1,9 +1,6 @@
 import boto3
+from .env import MINIO_ENDPOINT, ACCESS_KEY, SECRET_KEY,BUCKET_NAME
 
-MINIO_ENDPOINT = "minio:9000"
-ACCESS_KEY = "admin"
-SECRET_KEY = "password"
-BUCKET_NAME = "livros"
 
 s3_client = boto3.client(
     "s3",

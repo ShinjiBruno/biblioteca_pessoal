@@ -1,10 +1,20 @@
-from fastapi import FastAPI, Depends, UploadFile, File
+from fastapi import FastAPI, Depends, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import select
 from .database import init_db, get_session, Livro
 from .storage import upload_to_minio
 from typing import List, Optional
 
 app = FastAPI(title="Biblioteca API")
+
+# Allow frontend to fetch directly from this backend (local development)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200", "http://127.0.0.1:4200", "http://localhost:3000", "http://127.0.0.1:3000", "*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def on_startup():
@@ -18,11 +28,12 @@ async def listar_livros(session=Depends(get_session)):
 
 @app.post("/livros")
 async def criar_livro(
-    titulo: str,
-    autor: str,
+    titulo: str = Form(...),
+    autor: str = Form(...),
     arquivo: Optional[UploadFile] = File(default=None),
     session=Depends(get_session)
 ):
+    print(f"""Recebido título: {titulo}, autor: {autor}, arquivo: {arquivo.filename if arquivo else 'Nenhum arquivo'}""")
     file_url = None
     if arquivo is not None:
         file_url = upload_to_minio(arquivo)
@@ -50,8 +61,8 @@ async def deletar_livro(livro_id: int, session=Depends(get_session)):
 @app.put("/livros/{livro_id}")
 async def atualizar_livro(
     livro_id: int,
-    titulo: Optional[str] = None,
-    autor: Optional[str] = None,
+    titulo: Optional[str] = Form(default=None),
+    autor: Optional[str] = Form(default=None),
     arquivo: Optional[UploadFile] = File(default=None),
     session=Depends(get_session)
 ):
